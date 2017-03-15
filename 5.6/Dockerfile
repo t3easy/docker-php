@@ -4,6 +4,7 @@ RUN apk add --no-cache \
         ghostscript \
         openssl \
         poppler-utils \
+        unzip \
     && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.5/community graphicsmagick
 
 RUN apk add --no-cache --virtual .build-deps \
