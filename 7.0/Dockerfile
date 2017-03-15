@@ -3,8 +3,10 @@ FROM php:7.0-fpm-alpine
 RUN apk add --no-cache \
         ghostscript \
         openssl \
-    && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.5/community graphicsmagick \
-    && apk add --no-cache --virtual .build-deps \
+        poppler-utils \
+    && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.5/community graphicsmagick
+
+RUN apk add --no-cache --virtual .build-deps \
         freetype-dev \
         libjpeg-turbo-dev \
         libpng-dev \
@@ -16,3 +18,5 @@ RUN apk add --no-cache \
             soap \
             zip \
     && apk del .build-deps
+
+WORKDIR /app
