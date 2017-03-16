@@ -20,4 +20,10 @@ RUN apk add --no-cache --virtual .build-deps \
             zip \
     && apk del .build-deps
 
+RUN touch /usr/local/etc/php/conf.d/typo3.ini \
+    && echo "max_execution_time = 240;" >> /usr/local/etc/php/conf.d/typo3.ini \
+    && echo "max_input_vars = 1500;" >> /usr/local/etc/php/conf.d/typo3.ini \
+    && echo "post_max_size = 32M;" >> /usr/local/etc/php/conf.d/typo3.ini \
+    && echo "upload_max_filesize = 32M;" >> /usr/local/etc/php/conf.d/typo3.ini
+
 WORKDIR /app
