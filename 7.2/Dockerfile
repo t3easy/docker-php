@@ -1,13 +1,6 @@
 FROM php:7.2-fpm-alpine
 
-RUN apk del .persistent-deps \
-    && apk add --no-cache --virtual .persistent-deps \
-        ca-certificates \
-        curl \
-        tar \
-        xz \
-# https://github.com/docker-library/php/issues/494
-        openssl
+RUN sed -i 's/#default_bits/default_bits/g; s/#default_md/default_md/g' /etc/ssl/openssl.cnf
 
 RUN apk add --no-cache \
             --repository http://dl-cdn.alpinelinux.org/alpine/v3.7/community \
