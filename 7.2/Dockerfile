@@ -10,6 +10,8 @@ RUN apk del .persistent-deps \
         openssl
 
 RUN apk add --no-cache \
+            --repository http://dl-cdn.alpinelinux.org/alpine/v3.7/community \
+            --virtual .typo3-deps \
         ghostscript \
         graphicsmagick \
         poppler-utils \

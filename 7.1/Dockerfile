@@ -1,11 +1,12 @@
 FROM php:7.1-fpm-alpine
 
 RUN apk add --no-cache \
+            --repository http://dl-cdn.alpinelinux.org/alpine/v3.7/community \
+            --virtual .typo3-deps \
         ghostscript \
-        openssl \
+        graphicsmagick \
         poppler-utils \
-        unzip \
-    && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.5/community graphicsmagick
+        unzip
 
 RUN apk add --no-cache --virtual .build-deps \
         freetype-dev \
