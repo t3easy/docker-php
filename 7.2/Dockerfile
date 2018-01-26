@@ -1,9 +1,17 @@
 FROM php:7.2-fpm-alpine
 
+RUN apk del .persistent-deps \
+    && apk add --no-cache --virtual .persistent-deps \
+        ca-certificates \
+        curl \
+        tar \
+        xz \
+# https://github.com/docker-library/php/issues/494
+        openssl
+
 RUN apk add --no-cache \
         ghostscript \
         graphicsmagick \
-        openssl \
         poppler-utils \
         unzip
 
