@@ -7,6 +7,7 @@ RUN apk add --no-cache \
             --virtual .typo3-deps \
         ghostscript \
         graphicsmagick \
+        icu-libs \
         poppler-utils \
         unzip
 
@@ -15,9 +16,11 @@ RUN apk add --no-cache --virtual .build-deps \
         libjpeg-turbo-dev \
         libpng-dev \
         libxml2-dev \
+        icu-dev \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install \
             gd \
+            intl \
             mysqli \
             soap \
             zip \
