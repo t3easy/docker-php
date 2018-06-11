@@ -1,9 +1,8 @@
-FROM php:7.2-fpm-alpine
+FROM php:7.2-fpm-alpine3.7
 
 RUN sed -i 's/#default_bits/default_bits/g; s/#default_md/default_md/g' /etc/ssl/openssl.cnf
 
 RUN apk add --no-cache \
-            --repository http://dl-cdn.alpinelinux.org/alpine/v3.7/community \
             --virtual .typo3-deps \
         ghostscript \
         graphicsmagick \

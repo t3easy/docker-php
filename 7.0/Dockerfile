@@ -1,7 +1,6 @@
-FROM php:7.0-fpm-alpine
+FROM php:7.0-fpm-alpine3.7
 
 RUN apk add --no-cache \
-            --repository http://dl-cdn.alpinelinux.org/alpine/v3.5/community \
             --virtual .typo3-deps \
         ghostscript \
         graphicsmagick \
