@@ -1,4 +1,4 @@
-FROM php:7.2-fpm-alpine3.7
+FROM php:7.2-fpm-alpine3.8
 
 RUN sed -i 's/#default_bits/default_bits/g; s/#default_md/default_md/g' /etc/ssl/openssl.cnf
 
