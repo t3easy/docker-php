@@ -7,6 +7,7 @@ RUN apk add --no-cache \
         ghostscript \
         graphicsmagick \
         icu-libs \
+        libzip \
         poppler-utils \
         unzip
 
