@@ -13,7 +13,7 @@ RUN apk add --no-cache --virtual .build-deps \
         libzip-dev \
         icu-dev \
         zlib-dev \
- && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+ && docker-php-ext-configure gd --with-freetype-dir=/usr --with-png-dir=/usr --with-jpeg-dir=/usr \
  && docker-php-ext-configure zip --with-libzip \
  && docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) \
         gd \
