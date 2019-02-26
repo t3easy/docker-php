@@ -1,5 +1,7 @@
 FROM php:5.6-fpm-alpine3.7
 
+RUN sed -i 's/#default_bits/default_bits/g; s/#default_md/default_md/g' /etc/ssl/openssl.cnf
+
 RUN apk add --no-cache --virtual .typo3-deps \
         ghostscript \
         graphicsmagick \
