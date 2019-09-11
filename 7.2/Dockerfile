@@ -1,4 +1,4 @@
-FROM php:7.2-fpm-alpine3.9
+FROM php:7.2-fpm-alpine3.10
 
 RUN apk add --no-cache --virtual .typo3-deps \
         ghostscript \
