@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Build latest tag from the default args in the Dockerfile
+docker build -t $IMAGE_NAME .
+
+for version in "7.3" "7.2"; do
+  docker build --build-arg PHP_VERSION=$version -t $DOCKER_REPO:$version .
+  docker push $DOCKER_REPO:$version
+  for environment in "production" "development" ; do
+    docker build --build-arg PHP_VERSION=$version --build-arg TARGET_ENVIRONMENT=$environment -t $DOCKER_REPO:$version-$environment .
+    docker push $DOCKER_REPO:$version-$environment
+  done
+done
