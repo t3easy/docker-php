@@ -80,6 +80,7 @@ ENV PHP_APC_SHM_SEGMENTS="1" \
     PHP_APC_SHM_SIZE="128M"
 RUN { \
         echo 'apc.enabled=1'; \
+        echo 'apc.enable_cli=1'; \
         echo 'apc.shm_segments=${PHP_APC_SHM_SEGMENTS}'; \
         echo 'apc.shm_size=${PHP_APC_SHM_SIZE}'; \
     } >> $PHP_INI_DIR/conf.d/docker-php-ext-apcu.ini
