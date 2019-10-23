@@ -134,4 +134,6 @@ ENV COMPOSER_HOME /tmp
 ENV PATH "/tmp/vendor/bin:$PATH"
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
+RUN apk add --no-cache --virtual .dev-tools mariadb-client parallel
+
 FROM runtime-${BUILD_PLATFORM}-${TARGET_ENVIRONMENT} AS runtime
