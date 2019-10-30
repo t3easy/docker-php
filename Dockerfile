@@ -4,7 +4,6 @@ ARG BUILD_PLATFORM=alpine
 ARG ALPINE_VERSION=3.10
 
 ARG APCU_VERSION=5.1.17
-ARG COMPOSER_VERSION=1
 ARG REDIS_VERSION=5.0.2
 ARG XDEBUG_VERSION=2.7.2
 
@@ -90,7 +89,6 @@ WORKDIR /app
 FROM runtime-alpine-base as runtime-alpine-production
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-FROM composer:${COMPOSER_VERSION} AS composer
 FROM runtime-alpine-base as runtime-alpine-development
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="1"
@@ -132,7 +130,7 @@ RUN apk add --no-cache --virtual .composer-rundeps \
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_HOME /tmp
 ENV PATH "/tmp/vendor/bin:$PATH"
-COPY --from=composer /usr/bin/composer /usr/bin/composer
+COPY --from=composer:1 /usr/bin/composer /usr/bin/composer
 
 RUN apk add --no-cache --virtual .dev-tools mariadb-client parallel
 
