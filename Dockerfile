@@ -84,8 +84,6 @@ RUN { \
         echo 'apc.shm_size=${PHP_APC_SHM_SIZE}'; \
     } >> $PHP_INI_DIR/conf.d/docker-php-ext-apcu.ini
 
-WORKDIR /app
-
 FROM runtime-alpine-base as runtime-alpine-production
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
@@ -135,3 +133,7 @@ COPY --from=composer:1 /usr/bin/composer /usr/bin/composer
 RUN apk add --no-cache --virtual .dev-tools mariadb-client parallel
 
 FROM runtime-${BUILD_PLATFORM}-${TARGET_ENVIRONMENT} AS runtime
+
+RUN mkdir /app \
+ && chown -R www-data:www-data /app
+WORKDIR /app
