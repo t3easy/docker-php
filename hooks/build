@@ -3,7 +3,7 @@
 # Build latest tag from the default args in the Dockerfile
 docker build -t $IMAGE_NAME .
 
-for version in "7.3" "7.2"; do
+for version in "7.4" "7.3" "7.2"; do
   docker build --build-arg PHP_VERSION=$version -t $DOCKER_REPO:$version .
   docker push $DOCKER_REPO:$version
   for environment in "production" "development" ; do
