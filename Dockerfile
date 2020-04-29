@@ -27,8 +27,8 @@ RUN apk add --no-cache --virtual .build-deps \
         libzip-dev \
         icu-dev \
         zlib-dev \
- && docker-php-ext-configure gd --with-freetype-dir=/usr --with-png-dir=/usr --with-jpeg-dir=/usr \
- && docker-php-ext-configure zip --with-libzip \
+ && case $PHP_VERSION in 7.4.*) docker-php-ext-configure gd --with-freetype --with-jpeg;; *) docker-php-ext-configure gd --with-freetype-dir=/usr --with-png-dir=/usr --with-jpeg-dir=/usr;; esac \
+ && case $PHP_VERSION in 7.2.*) docker-php-ext-configure zip --with-libzip;; esac \
  && docker-php-ext-configure ldap \
  && docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) \
         gd \
