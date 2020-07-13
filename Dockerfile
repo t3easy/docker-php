@@ -1,12 +1,16 @@
 ARG PHP_VERSION=7.4
 ARG TARGET_ENVIRONMENT=production
 ARG BUILD_PLATFORM=alpine
-ARG ALPINE_VERSION=3.11
+ARG ALPINE_VERSION=3.12
 
+# https://pecl.php.net/package/APCu
 ARG APCU_VERSION=5.1.18
-ARG REDIS_VERSION=5.2.1
-ARG XDEBUG_VERSION=2.9.5
-
+# https://pecl.php.net/package/redis
+ARG REDIS_VERSION=5.3.1
+# https://pecl.php.net/package/xdebug
+ARG XDEBUG_VERSION=2.9.6
+# https://pecl.php.net/package/yaml
+ARG YAML_VERSION=2.1.0
 
 FROM php:${PHP_VERSION}-fpm-alpine${ALPINE_VERSION} as runtime-alpine-base
 
@@ -17,6 +21,7 @@ RUN apk add --no-cache --virtual .typo3-deps \
 
 ARG APCU_VERSION
 ARG REDIS_VERSION
+ARG YAML_VERSION
 RUN apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
         freetype-dev \
@@ -26,6 +31,7 @@ RUN apk add --no-cache --virtual .build-deps \
         libxml2-dev \
         libzip-dev \
         icu-dev \
+        yaml-dev \
         zlib-dev \
  && case $PHP_VERSION in 7.4.*) docker-php-ext-configure gd --with-freetype --with-jpeg;; *) docker-php-ext-configure gd --with-freetype-dir=/usr --with-png-dir=/usr --with-jpeg-dir=/usr;; esac \
  && case $PHP_VERSION in 7.2.*) docker-php-ext-configure zip --with-libzip;; esac \
@@ -40,9 +46,11 @@ RUN apk add --no-cache --virtual .build-deps \
         zip \
  && pecl install apcu-${APCU_VERSION} \
  && pecl install redis-${REDIS_VERSION} \
+ && pecl install yaml-${YAML_VERSION} \
  && docker-php-ext-enable \
         apcu \
         redis \
+        yaml \
  && runDeps="$( \
         scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
             | tr ',' '\n' \
