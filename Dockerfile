@@ -4,11 +4,11 @@ ARG BUILD_PLATFORM=alpine
 ARG ALPINE_VERSION=3.12
 
 # https://pecl.php.net/package/APCu
-ARG APCU_VERSION=5.1.18
+ARG APCU_VERSION=5.1.19
 # https://pecl.php.net/package/redis
-ARG REDIS_VERSION=5.3.1
+ARG REDIS_VERSION=5.3.2
 # https://pecl.php.net/package/xdebug
-ARG XDEBUG_VERSION=2.9.6
+ARG XDEBUG_VERSION=2.9.8
 # https://pecl.php.net/package/yaml
 ARG YAML_VERSION=2.1.0
 
