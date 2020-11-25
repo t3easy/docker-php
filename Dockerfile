@@ -1,5 +1,3 @@
-LABEL org.opencontainers.image.source=https://github.com/t3easy/docker-php
-
 ARG PHP_VERSION=7.4
 ARG TARGET_ENVIRONMENT=production
 ARG BUILD_PLATFORM=alpine
@@ -143,6 +141,8 @@ COPY --from=composer:1 /usr/bin/composer /usr/bin/composer
 RUN apk add --no-cache --virtual .dev-tools mariadb-client parallel
 
 FROM runtime-${BUILD_PLATFORM}-${TARGET_ENVIRONMENT} AS runtime
+
+LABEL org.opencontainers.image.source="https://github.com/t3easy/docker-php"
 
 RUN mkdir /app \
  && chown -R www-data:www-data /app
