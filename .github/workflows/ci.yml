@@ -2,7 +2,7 @@ name: ci
 
 on:
   push:
-    branches: master
+    branches: [master]
 
 jobs:
   multi-registries:
@@ -10,6 +10,9 @@ jobs:
     strategy:
       matrix:
         php: [7.4, 7.3, 7.2]
+    env:
+      LATEST_PHP: 7.4
+      IMAGE_NAME: t3easy/php
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -33,6 +36,21 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.CR_PAT }}
 
+    - name: Build and push latest image
+      uses: docker/build-push-action@v2
+      if: ${{ matrix.php == env.LATEST_PHP }}
+      with:
+        push: true
+        platforms: linux/amd64,linux/arm64
+        build-args: |
+          PHP_VERSION=${{ matrix.php }}
+          TARGET_ENVIRONMENT=production
+        tags: |
+          ${{ env.IMAGE_NAME }}
+          ghcr.io/${{ env.IMAGE_NAME }}
+        cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+        cache-from: type=local,src=/tmp/.buildx-cache
+
     - name: Build and push production images
       uses: docker/build-push-action@v2
       with:
@@ -42,11 +60,12 @@ jobs:
           PHP_VERSION=${{ matrix.php }}
           TARGET_ENVIRONMENT=production
         tags: |
-          t3easy/php:${{ matrix.php }}
-          t3easy/php:${{ matrix.php }}-production
-          ghcr.io/${{ github.repository_owner }}/php:${{ matrix.php }}
-          ghcr.io/${{ github.repository_owner }}/php:${{ matrix.php }}-production
+          ${{ env.IMAGE_NAME }}:${{ matrix.php }}
+          ${{ env.IMAGE_NAME }}:${{ matrix.php }}-production
+          ghcr.io/${{ env.IMAGE_NAME }}:${{ matrix.php }}
+          ghcr.io/${{ env.IMAGE_NAME }}:${{ matrix.php }}-production
         cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
+        cache-from: type=local,src=/tmp/.buildx-cache
 
     - name: Build and push development images
       uses: docker/build-push-action@v2
@@ -57,6 +76,7 @@ jobs:
           PHP_VERSION=${{ matrix.php }}
           TARGET_ENVIRONMENT=development
         tags: |
-          t3easy/php:${{ matrix.php }}-development
-          ghcr.io/${{ github.repository_owner }}/php:${{ matrix.php }}-development
+          ${{ env.IMAGE_NAME }}:${{ matrix.php }}-development
+          ghcr.io/${{ env.IMAGE_NAME }}:${{ matrix.php }}-development
+        cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
         cache-from: type=local,src=/tmp/.buildx-cache
