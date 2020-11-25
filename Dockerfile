@@ -1,3 +1,5 @@
+LABEL org.opencontainers.image.source=https://github.com/t3easy/docker-php
+
 ARG PHP_VERSION=7.4
 ARG TARGET_ENVIRONMENT=production
 ARG BUILD_PLATFORM=alpine
