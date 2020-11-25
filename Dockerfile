@@ -3,13 +3,13 @@ ARG TARGET_ENVIRONMENT=production
 ARG BUILD_PLATFORM=alpine
 ARG ALPINE_VERSION=3.12
 
-# https://pecl.php.net/package/APCu
+# https://github.com/krakjoe/apcu/releases
 ARG APCU_VERSION=5.1.19
-# https://pecl.php.net/package/redis
+# https://github.com/phpredis/phpredis/releases
 ARG REDIS_VERSION=5.3.2
-# https://pecl.php.net/package/xdebug
-ARG XDEBUG_VERSION=2.9.8
-# https://pecl.php.net/package/yaml
+# https://github.com/xdebug/xdebug/releases
+ARG XDEBUG_VERSION=3.0.0
+# https://github.com/php/pecl-file_formats-yaml/releases
 ARG YAML_VERSION=2.1.0
 
 FROM php:${PHP_VERSION}-fpm-alpine${ALPINE_VERSION} as runtime-alpine-base
@@ -23,7 +23,6 @@ ARG APCU_VERSION
 ARG REDIS_VERSION
 ARG YAML_VERSION
 RUN apk add --no-cache --virtual .build-deps \
-        $PHPIZE_DEPS \
         freetype-dev \
         openldap-dev \
         libjpeg-turbo-dev \
@@ -35,22 +34,26 @@ RUN apk add --no-cache --virtual .build-deps \
         zlib-dev \
  && case $PHP_VERSION in 7.4.*) docker-php-ext-configure gd --with-freetype --with-jpeg;; *) docker-php-ext-configure gd --with-freetype-dir=/usr --with-png-dir=/usr --with-jpeg-dir=/usr;; esac \
  && case $PHP_VERSION in 7.2.*) docker-php-ext-configure zip --with-libzip;; esac \
+ && docker-php-source extract \
+ && mkdir -p /usr/src/php/ext/apcu \
+ && curl -fsSL https://github.com/krakjoe/apcu/archive/v$APCU_VERSION.tar.gz | tar xz -C /usr/src/php/ext/apcu --strip 1 \
+ && mkdir -p /usr/src/php/ext/redis \
+ && curl -fsSL https://github.com/phpredis/phpredis/archive/$REDIS_VERSION.tar.gz | tar xz -C /usr/src/php/ext/redis --strip 1 \
+ && mkdir -p /usr/src/php/ext/yaml \
+ && curl -fsSL https://github.com/php/pecl-file_formats-yaml/archive/$YAML_VERSION.tar.gz | tar xz -C /usr/src/php/ext/yaml --strip 1 \
  && docker-php-ext-configure ldap \
- && docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) \
+ && docker-php-ext-install -j$(nproc) \
+        apcu \
         gd \
         intl \
         ldap \
-        opcache \
         mysqli \
-        soap \
-        zip \
- && pecl install apcu-${APCU_VERSION} \
- && pecl install redis-${REDIS_VERSION} \
- && pecl install yaml-${YAML_VERSION} \
- && docker-php-ext-enable \
-        apcu \
+        opcache \
         redis \
+        soap \
         yaml \
+        zip \
+ && docker-php-source delete \
  && runDeps="$( \
         scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
             | tr ',' '\n' \
@@ -58,8 +61,7 @@ RUN apk add --no-cache --virtual .build-deps \
             | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
     )" \
  && apk add --virtual .phpext-rundeps $runDeps \
- && apk del .build-deps \
- && rm -rf /tmp/pear
+ && apk del .build-deps
 
 RUN { \
         echo 'max_execution_time=240'; \
@@ -99,18 +101,6 @@ FROM runtime-alpine-base as runtime-alpine-development
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="1"
 
-ARG XDEBUG_VERSION
-RUN apk add --no-cache --virtual .phpize-deps $PHPIZE_DEPS \
- && pecl install xdebug-${XDEBUG_VERSION} \
- && docker-php-ext-enable xdebug \
- && apk del .phpize-deps \
- && rm -rf /tmp/pear
-RUN { \
-        echo 'xdebug.max_nesting_level=400'; \
-        echo 'xdebug.remote_enable=1'; \
-    } >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-ENV XDEBUG_CONFIG="idekey=PHPSTORM remote_host=host.docker.internal"
-
 ENV BLACKFIRE_HOST=blackfire
 RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
  && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/alpine/amd64/$version \
@@ -120,6 +110,13 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
  && docker-php-ext-enable blackfire \
  && echo 'blackfire.agent_socket=tcp://${BLACKFIRE_HOST}:8707' >> $PHP_INI_DIR/conf.d/docker-php-ext-blackfire.ini \
  && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
+
+ARG XDEBUG_VERSION
+RUN mkdir -p /usr/src/php/ext/xdebug \
+ && curl -fsSL https://github.com/xdebug/xdebug/archive/$XDEBUG_VERSION.tar.gz | tar xz -C /usr/src/php/ext/xdebug --strip 1 \
+ && docker-php-ext-install xdebug \
+ && echo 'xdebug.max_nesting_level=400' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+ENV XDEBUG_MODE="debug" DBGP_IDEKEY="PHPSTORM" XDEBUG_CONFIG="client_host=host.docker.internal"
 
 RUN apk add --no-cache --virtual .composer-rundeps \
         bash \
