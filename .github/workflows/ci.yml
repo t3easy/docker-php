@@ -9,7 +9,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: [7.4, 7.3, 7.2]
+        include:
+        - php: 8.0
+          php-ext-dir: /usr/local/lib/php/extensions/no-debug-non-zts-20200930
+        - php: 7.4
+          php-ext-dir: /usr/local/lib/php/extensions/no-debug-non-zts-20190902
+        - php: 7.3
+          php-ext-dir: /usr/local/lib/php/extensions/no-debug-non-zts-20180731
+        - php: 7.2
+          php-ext-dir: /usr/local/lib/php/extensions/no-debug-non-zts-20170718
+
     env:
       LATEST_PHP: 7.4
       IMAGE_NAME: t3easy/php
@@ -46,6 +55,7 @@ jobs:
         platforms: ${{ env.PLATFORMS }}
         build-args: |
           PHP_VERSION=${{ matrix.php }}
+          PHP_EXT_DIR=${{ matrix.php-ext-dir }}
           TARGET_ENVIRONMENT=production
         tags: |
           ${{ env.IMAGE_NAME }}
@@ -60,6 +70,7 @@ jobs:
         platforms: ${{ env.PLATFORMS }}
         build-args: |
           PHP_VERSION=${{ matrix.php }}
+          PHP_EXT_DIR=${{ matrix.php-ext-dir }}
           TARGET_ENVIRONMENT=production
         tags: |
           ${{ env.IMAGE_NAME }}:${{ matrix.php }}
@@ -76,6 +87,7 @@ jobs:
         platforms: ${{ env.PLATFORMS }}
         build-args: |
           PHP_VERSION=${{ matrix.php }}
+          PHP_EXT_DIR=${{ matrix.php-ext-dir }}
           TARGET_ENVIRONMENT=development
         tags: |
           ${{ env.IMAGE_NAME }}:${{ matrix.php }}-development
