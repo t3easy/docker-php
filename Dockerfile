@@ -177,8 +177,6 @@ RUN apk add --no-cache --virtual .composer-rundeps \
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-RUN composer --version
-
 FROM runtime-${BUILD_PLATFORM}-${TARGET_ENVIRONMENT} AS runtime
 
 LABEL org.opencontainers.image.source="https://github.com/t3easy/docker-php"
