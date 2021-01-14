@@ -19,8 +19,9 @@ ARG REDIS_VERSION
 ARG XDEBUG_VERSION
 ARG YAML_VERSION
 
-RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
- && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/alpine/amd64/$version \
+RUN apk add --no-cache dpkg dpkg-dev \
+ && version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
+ && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/alpine/$(dpkg-architecture -q DEB_BUILD_ARCH_CPU)/$version \
  && mkdir -p /tmp/blackfire \
  && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp/blackfire \
  && mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get('extension_dir');")/blackfire.so \
