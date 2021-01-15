@@ -9,8 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: ["8.0", "7.4", "7.3", "7.2"]
-        platform: ["linux/amd64", "linux/arm64"]
         include:
         - php: "8.0"
           php-ext-dir: /usr/local/lib/php/extensions/no-debug-non-zts-20200930
@@ -24,6 +22,7 @@ jobs:
     env:
       LATEST_PHP: "7.4"
       IMAGE_NAME: t3easy/php
+      PLATFORMS: linux/amd64,linux/arm64
 
     steps:
     - name: Checkout
@@ -53,7 +52,7 @@ jobs:
       if: ${{ matrix.php == env.LATEST_PHP }}
       with:
         push: true
-        platforms: ${{ matrix.platform }}
+        platforms: ${{ env.PLATFORMS }}
         build-args: |
           PHP_VERSION=${{ matrix.php }}
           PHP_EXT_DIR=${{ matrix.php-ext-dir }}
@@ -68,7 +67,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        platforms: ${{ matrix.platform }}
+        platforms: ${{ env.PLATFORMS }}
         build-args: |
           PHP_VERSION=${{ matrix.php }}
           PHP_EXT_DIR=${{ matrix.php-ext-dir }}
@@ -85,7 +84,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        platforms: ${{ matrix.platform }}
+        platforms: ${{ env.PLATFORMS }}
         build-args: |
           PHP_VERSION=${{ matrix.php }}
           PHP_EXT_DIR=${{ matrix.php-ext-dir }}
