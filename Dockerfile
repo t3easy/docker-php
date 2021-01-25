@@ -188,7 +188,7 @@ RUN runDeps="$( \
             | sort -u \
             | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
     )" \
- && apk add --virtual .phpext-rundeps $runDeps
+ && apk add --no-cache --virtual .phpext-rundeps $runDeps
 
 RUN mkdir /app \
  && chown -R www-data:www-data /app \
