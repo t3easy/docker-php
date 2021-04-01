@@ -5,9 +5,9 @@ ARG BUILD_PLATFORM=alpine
 ARG ALPINE_VERSION=3.12
 
 # https://github.com/krakjoe/apcu/releases
-ARG APCU_VERSION=5.1.19
+ARG APCU_VERSION=5.1.20
 # https://github.com/phpredis/phpredis/releases
-ARG REDIS_VERSION=5.3.3
+ARG REDIS_VERSION=5.3.4
 # https://github.com/xdebug/xdebug/releases
 ARG XDEBUG_VERSION=3.0.3
 # https://github.com/php/pecl-file_formats-yaml/releases
