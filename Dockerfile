@@ -9,7 +9,7 @@ ARG APCU_VERSION=5.1.20
 # https://github.com/phpredis/phpredis/releases
 ARG REDIS_VERSION=5.3.4
 # https://github.com/xdebug/xdebug/releases
-ARG XDEBUG_VERSION=3.0.3
+ARG XDEBUG_VERSION=3.0.4
 # https://github.com/php/pecl-file_formats-yaml/releases
 ARG YAML_VERSION=2.2.1
 
