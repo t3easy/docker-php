@@ -1,4 +1,4 @@
-name: ci
+name: Build and push Docker images
 
 on:
   schedule:
@@ -62,11 +62,16 @@ jobs:
         tags: |
           ${{ env.IMAGE_NAME }}
           ghcr.io/${{ env.IMAGE_NAME }}
+          ${{ env.IMAGE_NAME }}:${{ matrix.php }}
+          ${{ env.IMAGE_NAME }}:${{ matrix.php }}-production
+          ghcr.io/${{ env.IMAGE_NAME }}:${{ matrix.php }}
+          ghcr.io/${{ env.IMAGE_NAME }}:${{ matrix.php }}-production
         cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
         cache-from: type=local,src=/tmp/.buildx-cache
 
     - name: Build and push production images
       uses: docker/build-push-action@v2
+      if: ${{ matrix.php != env.LATEST_PHP }}
       with:
         push: true
         platforms: ${{ env.PLATFORMS }}
