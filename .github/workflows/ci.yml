@@ -1,6 +1,8 @@
 name: ci
 
 on:
+  schedule:
+  - cron: "42 4 * * 1"
   push:
     branches: [main]
 
