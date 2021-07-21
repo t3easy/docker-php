@@ -7,8 +7,12 @@ on:
     branches: [main]
 
 jobs:
-  multi-registries:
+  build-and-push:
+    name: Build and push Docker image
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
     strategy:
       matrix:
         include:
@@ -27,9 +31,6 @@ jobs:
       PLATFORMS: linux/amd64,linux/arm64
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
 
