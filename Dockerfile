@@ -64,35 +64,37 @@ RUN apk add --no-cache --virtual .build-deps \
         zip
 
 RUN { \
-        echo 'max_execution_time=${PHP_MAX_EXECUTION_TIME}'; \
-        echo 'max_input_vars=${PHP_MAX_INPUT_VARS}'; \
-        echo 'post_max_size=${PHP_POST_MAX_SIZE}'; \
-        echo 'upload_max_filesize=${PHP_UPLOAD_MAX_FILESIZE}'; \
+        echo 'max_execution_time = ${PHP_MAX_EXECUTION_TIME}'; \
+        echo 'max_input_vars = ${PHP_MAX_INPUT_VARS}'; \
+        echo 'memory_limit = ${PHP_MEMORY_LIMIT}'; \
+        echo 'post_max_size = ${PHP_POST_MAX_SIZE}'; \
+        echo 'upload_max_filesize = ${PHP_UPLOAD_MAX_FILESIZE}'; \
     } > $PHP_INI_DIR/conf.d/custom.ini
 
 RUN docker-php-ext-enable opcache
 RUN { \
-        echo 'opcache.enable=1'; \
-        echo 'opcache.interned_strings_buffer=16'; \
-        echo 'opcache.max_accelerated_files=${PHP_OPCACHE_MAX_ACCELERATED_FILES}'; \
-        echo 'opcache.max_wasted_percentage=${PHP_OPCACHE_MAX_WASTED_PERCENTAGE}'; \
-        echo 'opcache.memory_consumption=${PHP_OPCACHE_MEMORY_CONSUMPTION}'; \
-        echo 'opcache.revalidate_freq=0'; \
-        echo 'opcache.save_comments=1'; \
-        echo 'opcache.validate_timestamps=${PHP_OPCACHE_VALIDATE_TIMESTAMPS}'; \
+        echo 'opcache.enable = 1'; \
+        echo 'opcache.interned_strings_buffer = 16'; \
+        echo 'opcache.max_accelerated_files = ${PHP_OPCACHE_MAX_ACCELERATED_FILES}'; \
+        echo 'opcache.max_wasted_percentage = ${PHP_OPCACHE_MAX_WASTED_PERCENTAGE}'; \
+        echo 'opcache.memory_consumption = ${PHP_OPCACHE_MEMORY_CONSUMPTION}'; \
+        echo 'opcache.revalidate_freq = 0'; \
+        echo 'opcache.save_comments = 1'; \
+        echo 'opcache.validate_timestamps = ${PHP_OPCACHE_VALIDATE_TIMESTAMPS}'; \
     } >> $PHP_INI_DIR/conf.d/docker-php-ext-opcache.ini
 
 RUN { \
-        echo 'apc.enabled=1'; \
-        echo 'apc.enable_cli=1'; \
-        echo 'apc.shm_size=${PHP_APC_SHM_SIZE}'; \
+        echo 'apc.enabled = 1'; \
+        echo 'apc.enable_cli = 1'; \
+        echo 'apc.shm_size = ${PHP_APC_SHM_SIZE}'; \
     } >> $PHP_INI_DIR/conf.d/docker-php-ext-apcu.ini
-RUN echo 'xdebug.max_nesting_level=400' >> $PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini
+RUN echo 'xdebug.max_nesting_level = 400' >> $PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini
 
 FROM php:${PHP_VERSION}-fpm-alpine${ALPINE_VERSION} as runtime-alpine-base
 ENV PHP_APC_SHM_SIZE="128M" \
     PHP_MAX_EXECUTION_TIME="240" \
     PHP_MAX_INPUT_VARS="1500" \
+    PHP_MEMORY_LIMIT="128M" \
     PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
     PHP_OPCACHE_MAX_ACCELERATED_FILES="10000" \
     PHP_OPCACHE_MEMORY_CONSUMPTION="192" \
