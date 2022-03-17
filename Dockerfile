@@ -2,7 +2,7 @@ ARG PHP_VERSION=7.4
 ARG PHP_EXT_DIR=/usr/local/lib/php/extensions/no-debug-non-zts-20190902
 ARG TARGET_ENVIRONMENT=production
 ARG BUILD_PLATFORM=alpine
-ARG ALPINE_VERSION=3.14
+ARG ALPINE_VERSION=3.15
 
 # https://github.com/krakjoe/apcu/releases
 ARG APCU_VERSION=5.1.21
