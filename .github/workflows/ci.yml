@@ -16,6 +16,9 @@ jobs:
     strategy:
       matrix:
         include:
+        - php: "8.1"
+          php-ext-dir: /usr/local/lib/php/extensions/no-debug-non-zts-20210902
+          alpine: "3.15"
         - php: "8.0"
           php-ext-dir: /usr/local/lib/php/extensions/no-debug-non-zts-20200930
           alpine: "3.14"
