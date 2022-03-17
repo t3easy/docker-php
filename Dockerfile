@@ -39,7 +39,7 @@ RUN apk add --no-cache --virtual .build-deps \
         icu-dev \
         yaml-dev \
         zlib-dev \
- && case $PHP_VERSION in 8.0.*|7.4.*) docker-php-ext-configure gd --with-freetype --with-jpeg;; *) docker-php-ext-configure gd --with-freetype-dir=/usr --with-png-dir=/usr --with-jpeg-dir=/usr;; esac \
+ && case $PHP_VERSION in 8.*|7.4.*) docker-php-ext-configure gd --with-freetype --with-jpeg;; *) docker-php-ext-configure gd --with-freetype-dir=/usr --with-png-dir=/usr --with-jpeg-dir=/usr;; esac \
  && case $PHP_VERSION in 7.2.*) docker-php-ext-configure zip --with-libzip;; esac \
  && docker-php-source extract \
  && mkdir -p /usr/src/php/ext/apcu \
