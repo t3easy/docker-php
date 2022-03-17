@@ -5,13 +5,13 @@ ARG BUILD_PLATFORM=alpine
 ARG ALPINE_VERSION=3.14
 
 # https://github.com/krakjoe/apcu/releases
-ARG APCU_VERSION=5.1.20
-# https://github.com/phpredis/phpredis/releases
-ARG REDIS_VERSION=5.3.4
-# https://github.com/xdebug/xdebug/releases
-ARG XDEBUG_VERSION=3.0.4
-# https://github.com/php/pecl-file_formats-yaml/releases
-ARG YAML_VERSION=2.2.1
+ARG APCU_VERSION=5.1.21
+# https://github.com/phpredis/phpredis/tags
+ARG REDIS_VERSION=5.3.7
+# https://github.com/xdebug/xdebug/tags
+ARG XDEBUG_VERSION=3.1.3
+# https://github.com/php/pecl-file_formats-yaml/tags
+ARG YAML_VERSION=2.2.2
 
 FROM php:${PHP_VERSION}-fpm-alpine${ALPINE_VERSION} as builder-alpine
 ARG APCU_VERSION
