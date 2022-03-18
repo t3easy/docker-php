@@ -29,7 +29,7 @@ COMPOSER_ALLOW_SUPERUSER=1
 COMPOSER_HOME="/tmp"
 DBGP_IDEKEY="PHPSTORM"
 PHP_OPCACHE_VALIDATE_TIMESTAMPS="1"
-XDEBUG_MODE="debug"
+XDEBUG_MODE="off"
 XDEBUG_CONFIG="client_host=host.docker.internal"
 ```
 The folders `/app/vendor/bin` and `/tmp/vendor/bin` ar already in PATHs.
@@ -38,10 +38,15 @@ The folders `/app/vendor/bin` and `/tmp/vendor/bin` ar already in PATHs.
 
 Run PHPunit tests in folder `tests`
 ```shell
-docker run --rm -v $PWD:/app -e XDEBUG_MODE=off t3easy/php:7.4-development phpunit tests
+docker run --rm -v $PWD:/app t3easy/php:7.4-development phpunit tests
 ```
 
 Run PHPStan
 ```shell
-docker run --rm -v $PWD:/app -e XDEBUG_MODE=off -e PHP_MEMORY_LIMIT=256M t3easy/php:7.4-development phpstan analyse --ansi
+docker run --rm -v $PWD:/app -e PHP_MEMORY_LIMIT=256M t3easy/php:7.4-development phpstan analyse --ansi
+```
+
+Run composer
+```shell
+docker run --rm -v $PWD:/app t3easy/php:7.4-development composer update --dry-run
 ```

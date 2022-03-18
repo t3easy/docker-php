@@ -149,7 +149,7 @@ ENV BLACKFIRE_HOST="blackfire" \
     DBGP_IDEKEY="PHPSTORM" \
     PATH="/tmp/vendor/bin:$PATH" \
     PHP_OPCACHE_VALIDATE_TIMESTAMPS="1" \
-    XDEBUG_MODE="debug" \
+    XDEBUG_MODE="off" \
     XDEBUG_CONFIG="client_host=host.docker.internal"
 
 COPY --from=builder-alpine \
