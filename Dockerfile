@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 ARG PHP_VERSION=7.4
 ARG PHP_EXT_DIR=/usr/local/lib/php/extensions/no-debug-non-zts-20190902
 ARG TARGET_ENVIRONMENT=production
