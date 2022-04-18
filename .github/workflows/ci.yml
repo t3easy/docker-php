@@ -2,9 +2,13 @@ name: Build and push Docker images
 
 on:
   schedule:
-  - cron: "42 4 * * 1"
+  - cron: '42 4 * * *'
   push:
-    branches: [main]
+    branches:
+    - '**'
+  pull_request:
+    branches:
+    - '**'
 
 jobs:
   build-and-push:
@@ -44,14 +48,24 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
 
+    - name: Cache Docker layers
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+
     - name: Login to DockerHub
       uses: docker/login-action@v1
+      if: github.event_name != 'pull_request'
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v1
+      if: github.event_name != 'pull_request'
       with:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
@@ -61,7 +75,7 @@ jobs:
       uses: docker/build-push-action@v2
       if: ${{ matrix.php == env.LATEST_PHP }}
       with:
-        push: true
+        push: ${{ github.event_name != 'pull_request' }}
         platforms: ${{ env.PLATFORMS }}
         build-args: |
           PHP_VERSION=${{ matrix.php }}
@@ -74,14 +88,14 @@ jobs:
           ${{ env.IMAGE_NAME }}:${{ matrix.php }}-production
           ghcr.io/${{ env.IMAGE_NAME }}:${{ matrix.php }}
           ghcr.io/${{ env.IMAGE_NAME }}:${{ matrix.php }}-production
-        cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
         cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
     - name: Build and push production images
       uses: docker/build-push-action@v2
       if: ${{ matrix.php != env.LATEST_PHP }}
       with:
-        push: true
+        push: ${{ github.event_name != 'pull_request' }}
         platforms: ${{ env.PLATFORMS }}
         build-args: |
           ALPINE_VERSION=${{ matrix.alpine }}
@@ -93,13 +107,13 @@ jobs:
           ${{ env.IMAGE_NAME }}:${{ matrix.php }}-production
           ghcr.io/${{ env.IMAGE_NAME }}:${{ matrix.php }}
           ghcr.io/${{ env.IMAGE_NAME }}:${{ matrix.php }}-production
-        cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
         cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
     - name: Build and push development images
       uses: docker/build-push-action@v2
       with:
-        push: true
+        push: ${{ github.event_name != 'pull_request' }}
         platforms: ${{ env.PLATFORMS }}
         build-args: |
           ALPINE_VERSION=${{ matrix.alpine }}
@@ -109,5 +123,10 @@ jobs:
         tags: |
           ${{ env.IMAGE_NAME }}:${{ matrix.php }}-development
           ghcr.io/${{ env.IMAGE_NAME }}:${{ matrix.php }}-development
-        cache-to: type=local,mode=max,dest=/tmp/.buildx-cache
         cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+    - name: Move cache
+      run: |
+        rm -rf /tmp/.buildx-cache
+        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
