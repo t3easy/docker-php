@@ -32,7 +32,7 @@ PHP_OPCACHE_VALIDATE_TIMESTAMPS="1"
 XDEBUG_MODE="off"
 XDEBUG_CONFIG="client_host=host.docker.internal"
 ```
-The folders `/app/vendor/bin` and `/tmp/vendor/bin` ar already in PATHs.
+The folders `/app/vendor/bin` and `/tmp/vendor/bin` are already in PATHs.
 
 ## Examples
 
