@@ -104,6 +104,10 @@ ENV PHP_APC_SHM_SIZE="128M" \
     PHP_OPCACHE_MAX_ACCELERATED_FILES="10000" \
     PHP_OPCACHE_MEMORY_CONSUMPTION="192" \
     PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10" \
+    PHP_PM_MAX_CHILDREN="5" \
+    PHP_PM_START_SERVERS="2" \
+    PHP_PM_MIN_SPARE_SERVERS="1" \
+    PHP_PM_MAX_SPARE_SERVERS="3" \
     PHP_POST_MAX_SIZE="32M" \
     PHP_UPLOAD_MAX_FILESIZE="32M"
 
@@ -139,6 +143,15 @@ COPY --from=builder-alpine \
     $PHP_INI_DIR/conf.d/docker-php-ext-zip.ini \
     $PHP_INI_DIR/conf.d/custom.ini \
     $PHP_INI_DIR/conf.d/
+
+RUN set -eux; \
+    { \
+        echo '[www]'; \
+        echo 'pm.max_children = ${PHP_PM_MAX_CHILDREN}'; \
+        echo 'pm.start_servers = ${PHP_PM_START_SERVERS}'; \
+        echo 'pm.min_spare_servers = ${PHP_PM_MIN_SPARE_SERVERS}'; \
+        echo 'pm.max_spare_servers = ${PHP_PM_MAX_SPARE_SERVERS}'; \
+    } | tee "/usr/local/etc/php-fpm.d/zz-pm.conf"
 
 FROM runtime-alpine-base as runtime-alpine-production
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
