@@ -20,49 +20,53 @@ ARG REDIS_VERSION
 ARG XDEBUG_VERSION
 ARG YAML_VERSION
 
-RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
- && architecture=$(case $(uname -m) in i386 | i686 | x86) echo "i386" ;; x86_64 | amd64) echo "amd64" ;; aarch64 | arm64 | armv8) echo "arm64" ;; *) echo "amd64" ;; esac) \
- && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/alpine/$architecture/$version \
- && mkdir -p /tmp/blackfire \
- && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp/blackfire \
- && mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get('extension_dir');")/blackfire.so \
- && docker-php-ext-enable blackfire \
- && echo 'blackfire.agent_socket=tcp://${BLACKFIRE_HOST}:${BLACKFIRE_PORT}' >> $PHP_INI_DIR/conf.d/docker-php-ext-blackfire.ini \
- && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
+RUN set -eux; \
+        version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;"); \
+        architecture=$(case $(uname -m) in i386 | i686 | x86) echo "i386" ;; x86_64 | amd64) echo "amd64" ;; aarch64 | arm64 | armv8) echo "arm64" ;; *) echo "amd64" ;; esac); \
+        curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/alpine/$architecture/$version; \
+        mkdir -p /tmp/blackfire; \
+        tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp/blackfire; \
+        mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get('extension_dir');")/blackfire.so; \
+        docker-php-ext-enable blackfire; \
+        echo 'blackfire.agent_socket=tcp://${BLACKFIRE_HOST}:${BLACKFIRE_PORT}' >> $PHP_INI_DIR/conf.d/docker-php-ext-blackfire.ini; \
+        rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
 
-RUN apk add --no-cache --virtual .build-deps \
-        freetype-dev \
-        openldap-dev \
-        libjpeg-turbo-dev \
-        libpng-dev \
-        libxml2-dev \
-        libzip-dev \
-        icu-dev \
-        yaml-dev \
-        zlib-dev \
- && case $PHP_VERSION in 8.*|7.4.*) docker-php-ext-configure gd --with-freetype --with-jpeg;; *) docker-php-ext-configure gd --with-freetype-dir=/usr --with-png-dir=/usr --with-jpeg-dir=/usr;; esac \
- && case $PHP_VERSION in 7.2.*) docker-php-ext-configure zip --with-libzip;; esac \
- && docker-php-source extract \
- && mkdir -p /usr/src/php/ext/apcu \
- && curl -fsSL https://github.com/krakjoe/apcu/archive/v$APCU_VERSION.tar.gz | tar xz -C /usr/src/php/ext/apcu --strip 1 \
- && mkdir -p /usr/src/php/ext/redis \
- && curl -fsSL https://github.com/phpredis/phpredis/archive/$REDIS_VERSION.tar.gz | tar xz -C /usr/src/php/ext/redis --strip 1 \
- && mkdir -p /usr/src/php/ext/xdebug \
- && curl -fsSL https://github.com/xdebug/xdebug/archive/$XDEBUG_VERSION.tar.gz | tar xz -C /usr/src/php/ext/xdebug --strip 1 \
- && mkdir -p /usr/src/php/ext/yaml \
- && curl -fsSL https://github.com/php/pecl-file_formats-yaml/archive/$YAML_VERSION.tar.gz | tar xz -C /usr/src/php/ext/yaml --strip 1 \
- && docker-php-ext-configure ldap \
- && docker-php-ext-install -j$(nproc) \
-        apcu \
-        gd \
-        intl \
-        ldap \
-        mysqli \
-        redis \
-        soap \
-        xdebug \
-        yaml \
-        zip
+RUN set -eux; \
+        apk add --no-cache --virtual .build-deps \
+            freetype-dev \
+            openldap-dev \
+            libjpeg-turbo-dev \
+            libpng-dev \
+            libxml2-dev \
+            libzip-dev \
+            linux-headers \
+            icu-dev \
+            yaml-dev \
+            zlib-dev \
+        ; \
+        \
+        docker-php-ext-configure gd --with-freetype --with-jpeg; \
+        docker-php-source extract; \
+        mkdir -p /usr/src/php/ext/apcu; \
+        curl -fsSL https://github.com/krakjoe/apcu/archive/v$APCU_VERSION.tar.gz | tar xz -C /usr/src/php/ext/apcu --strip 1; \
+        mkdir -p /usr/src/php/ext/redis; \
+        curl -fsSL https://github.com/phpredis/phpredis/archive/$REDIS_VERSION.tar.gz | tar xz -C /usr/src/php/ext/redis --strip 1; \
+        mkdir -p /usr/src/php/ext/xdebug; \
+        curl -fsSL https://github.com/xdebug/xdebug/archive/$XDEBUG_VERSION.tar.gz | tar xz -C /usr/src/php/ext/xdebug --strip 1; \
+        mkdir -p /usr/src/php/ext/yaml; \
+        curl -fsSL https://github.com/php/pecl-file_formats-yaml/archive/$YAML_VERSION.tar.gz | tar xz -C /usr/src/php/ext/yaml --strip 1; \
+        docker-php-ext-configure ldap; \
+        docker-php-ext-install -j$(nproc) \
+            apcu \
+            gd \
+            intl \
+            ldap \
+            mysqli \
+            redis \
+            soap \
+            xdebug \
+            yaml \
+            zip
 
 RUN { \
         echo 'max_execution_time = ${PHP_MAX_EXECUTION_TIME}'; \
@@ -163,21 +167,24 @@ COPY --from=builder-alpine \
     $PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini \
     $PHP_INI_DIR/conf.d/
 
-RUN apk add --no-cache --virtual .composer-rundeps \
-        bash \
-        coreutils \
-        git \
-        make \
-        mercurial \
-        openssh-client \
-        patch \
-        subversion \
-        tini \
-        unzip \
-        zip \
- && apk add --no-cache --virtual .dev-tools \
-        mariadb-client \
-        parallel
+RUN set -eux; \
+        apk add --no-cache --virtual .composer-rundeps \
+            bash \
+            coreutils \
+            git \
+            make \
+            mercurial \
+            openssh-client \
+            patch \
+            subversion \
+            tini \
+            unzip \
+            zip \
+        ; \
+        \
+        apk add --no-cache --virtual .dev-tools \
+            mariadb-client \
+            parallel
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -185,18 +192,22 @@ FROM runtime-${BUILD_PLATFORM}-${TARGET_ENVIRONMENT} AS runtime
 
 LABEL org.opencontainers.image.source="https://github.com/t3easy/docker-php"
 
-RUN runDeps="$( \
-        scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
-            | tr ',' '\n' \
-            | sort -u \
-            | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
-    )" \
- && apk add --no-cache --virtual .phpext-rundeps $runDeps
+RUN set -eux; \
+        runDeps="$( \
+            scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
+                | tr ',' '\n' \
+                | sort -u \
+                | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+        )"; \
+        \
+        apk add --no-cache --virtual .phpext-rundeps $runDeps
 
-RUN mkdir /app \
- && chown -R www-data:www-data /app \
- && php --version \
- && if [ -f /usr/bin/composer ]; then composer --version; fi
+RUN set -eux; \
+        mkdir /app; \
+        chown -R www-data:www-data /app; \
+        php --version; \
+        if [ -f /usr/bin/composer ]; then composer --version; fi
+
 WORKDIR /app
 
 ENV PATH="/app/vendor/bin:$PATH"
