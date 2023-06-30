@@ -130,6 +130,9 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
+    - name: Checkout to update repo description
+      uses: actions/checkout@v3
+
     - name: Update repo description
       uses: peter-evans/dockerhub-description@v3
       with:
