@@ -1,18 +1,18 @@
 # syntax=docker/dockerfile:1
-ARG PHP_VERSION=7.4
-ARG PHP_EXT_DIR=/usr/local/lib/php/extensions/no-debug-non-zts-20190902
+ARG PHP_VERSION=8.2
+ARG PHP_EXT_DIR=/usr/local/lib/php/extensions/no-debug-non-zts-20220829
 ARG TARGET_ENVIRONMENT=production
 ARG BUILD_PLATFORM=alpine
-ARG ALPINE_VERSION=3.15
+ARG ALPINE_VERSION=3.18
 
 # https://github.com/krakjoe/apcu/releases
-ARG APCU_VERSION=5.1.21
+ARG APCU_VERSION=5.1.22
 # https://github.com/phpredis/phpredis/tags
 ARG REDIS_VERSION=5.3.7
 # https://github.com/xdebug/xdebug/tags
-ARG XDEBUG_VERSION=3.1.3
+ARG XDEBUG_VERSION=3.2.1
 # https://github.com/php/pecl-file_formats-yaml/tags
-ARG YAML_VERSION=2.2.2
+ARG YAML_VERSION=2.2.3
 
 FROM php:${PHP_VERSION}-fpm-alpine${ALPINE_VERSION} as builder-alpine
 ARG APCU_VERSION

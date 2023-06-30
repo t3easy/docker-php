@@ -32,9 +32,10 @@ jobs:
         - php: "7.4"
           php-ext-dir: /usr/local/lib/php/extensions/no-debug-non-zts-20190902
           alpine: "3.16"
+          xdebug: "3.1.6"
 
     env:
-      LATEST_PHP: "7.4"
+      LATEST_PHP: "8.2"
       IMAGE_NAME: t3easy/php
       PLATFORMS: linux/amd64,linux/arm64
 
@@ -77,6 +78,7 @@ jobs:
         build-args: |
           PHP_VERSION=${{ matrix.php }}
           PHP_EXT_DIR=${{ matrix.php-ext-dir }}
+          XDEBUG_VERSION=${{ matrix.xdebug }}
           TARGET_ENVIRONMENT=production
         tags: |
           ${{ env.IMAGE_NAME }}
@@ -98,6 +100,7 @@ jobs:
           ALPINE_VERSION=${{ matrix.alpine }}
           PHP_VERSION=${{ matrix.php }}
           PHP_EXT_DIR=${{ matrix.php-ext-dir }}
+          XDEBUG_VERSION=${{ matrix.xdebug }}
           TARGET_ENVIRONMENT=production
         tags: |
           ${{ env.IMAGE_NAME }}:${{ matrix.php }}
@@ -116,6 +119,7 @@ jobs:
           ALPINE_VERSION=${{ matrix.alpine }}
           PHP_VERSION=${{ matrix.php }}
           PHP_EXT_DIR=${{ matrix.php-ext-dir }}
+          XDEBUG_VERSION=${{ matrix.xdebug }}
           TARGET_ENVIRONMENT=development
         tags: |
           ${{ env.IMAGE_NAME }}:${{ matrix.php }}-development
