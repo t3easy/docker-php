@@ -20,37 +20,41 @@ jobs:
     strategy:
       matrix:
         include:
+        - php: "8.3"
+          php-ext-dir: /usr/local/lib/php/extensions/no-debug-non-zts-20230831
+          alpine: "3.19"
+          xdebug: "3.3.1"
         - php: "8.2"
           php-ext-dir: /usr/local/lib/php/extensions/no-debug-non-zts-20220829
-          alpine: "3.18"
-          xdebug: "3.2.1"
+          alpine: "3.19"
+          xdebug: "3.3.1"
         - php: "8.1"
           php-ext-dir: /usr/local/lib/php/extensions/no-debug-non-zts-20210902
-          alpine: "3.18"
-          xdebug: "3.2.1"
+          alpine: "3.19"
+          xdebug: "3.3.1"
         - php: "8.0"
           php-ext-dir: /usr/local/lib/php/extensions/no-debug-non-zts-20200930
           alpine: "3.16"
-          xdebug: "3.2.1"
+          xdebug: "3.3.1"
         - php: "7.4"
           php-ext-dir: /usr/local/lib/php/extensions/no-debug-non-zts-20190902
           alpine: "3.16"
           xdebug: "3.1.6"
 
     env:
-      LATEST_PHP: "8.2"
+      LATEST_PHP: "8.3"
       IMAGE_NAME: t3easy/php
       PLATFORMS: linux/amd64,linux/arm64
 
     steps:
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
+      uses: docker/setup-qemu-action@v3
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
 
     - name: Cache Docker layers
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: /tmp/.buildx-cache
         key: ${{ runner.os }}-buildx-${{ github.sha }}
@@ -58,14 +62,14 @@ jobs:
           ${{ runner.os }}-buildx-
 
     - name: Login to DockerHub
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       if: github.event_name != 'pull_request'
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Login to GitHub Container Registry
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       if: github.event_name != 'pull_request'
       with:
         registry: ghcr.io
@@ -73,7 +77,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build and push latest image
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       if: ${{ matrix.php == env.LATEST_PHP }}
       with:
         push: ${{ github.event_name != 'pull_request' }}
@@ -94,7 +98,7 @@ jobs:
         cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
     - name: Build and push production images
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       if: ${{ matrix.php != env.LATEST_PHP }}
       with:
         push: ${{ github.event_name != 'pull_request' }}
@@ -114,7 +118,7 @@ jobs:
         cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
     - name: Build and push development images
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         push: ${{ github.event_name != 'pull_request' }}
         platforms: ${{ env.PLATFORMS }}
